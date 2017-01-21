@@ -78,8 +78,7 @@ func play(c *cli.Context) error {
 }
 
 func pause(c *cli.Context) error {
-	_, err := mack.Tell("iTunes", "pause")
-	if err != nil {
+	if _, err := mack.Tell("iTunes", "pause"); err != nil {
 		return fmt.Errorf("cannot pause current music: %s", err)
 	}
 
@@ -87,8 +86,7 @@ func pause(c *cli.Context) error {
 }
 
 func next(c *cli.Context) error {
-	_, err := mack.Tell("iTunes", "next track")
-	if err != nil {
+	if _, err := mack.Tell("iTunes", "next track"); err != nil {
 		return fmt.Errorf("cannot play next music: %s", err)
 	}
 
@@ -96,8 +94,7 @@ func next(c *cli.Context) error {
 }
 
 func prev(c *cli.Context) error {
-	_, err := mack.Tell("iTunes", "previous track")
-	if err != nil {
+	if _, err := mack.Tell("iTunes", "previous track"); err != nil {
 		return fmt.Errorf("cannot play previous music: %s", err)
 	}
 
@@ -105,8 +102,7 @@ func prev(c *cli.Context) error {
 }
 
 func back(c *cli.Context) error {
-	_, err := mack.Tell("iTunes", "back track")
-	if err != nil {
+	if _, err := mack.Tell("iTunes", "back track"); err != nil {
 		return fmt.Errorf("cannot back music: %s", err)
 	}
 
@@ -128,8 +124,7 @@ func vol(c *cli.Context) error {
 		return fmt.Errorf("invalid range: %d", n)
 	}
 
-	_, err = mack.Tell("iTunes", fmt.Sprintf("set sound volume to %d", n))
-	if err != nil {
+	if _, err = mack.Tell("iTunes", fmt.Sprintf("set sound volume to %d", n)); err != nil {
 		return fmt.Errorf("cannot change volume: %s", err)
 	}
 
@@ -177,11 +172,14 @@ func find(c *cli.Context) error {
 	)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot start fuzzy-search: %s", err)
 	}
 
-	_, err = mack.Tell("iTunes", "play "+selectType+` "`+strings.TrimSpace(string(out))+`"`)
-	if err != nil {
+	if strings.TrimSpace(string(out)) == "" {
+		return fmt.Errorf("cannot select empty string")
+	}
+
+	if _, err = mack.Tell("iTunes", "play "+selectType+` "`+strings.TrimSpace(string(out))+`"`); err != nil {
 		return fmt.Errorf("cannot play music: %s", err)
 	}
 
