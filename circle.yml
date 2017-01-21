@@ -1,0 +1,4 @@
+test:
+  override:
+    - go get github.com/urfave/cli
+    - go test -v -race ./itunes/...
