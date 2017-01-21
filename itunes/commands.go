@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/everdev/mack"
+	pipeline "github.com/mattn/go-pipeline"
 	"github.com/urfave/cli"
 )
 
@@ -50,12 +52,12 @@ var commands = []cli.Command{
 		Name:    "find",
 		Aliases: []string{"v"},
 		Usage:   "Find a music (or playlist, artist, album) by fuzzy search apps",
-		Action:  nil,
+		Action:  find,
 	},
 }
 
 func play(c *cli.Context) error {
-	err := mack.Tell("iTunes", "play")
+	_, err := mack.Tell("iTunes", "play")
 	if err != nil {
 		return fmt.Errorf("cannot play music: %s", err)
 	}
@@ -64,7 +66,7 @@ func play(c *cli.Context) error {
 }
 
 func pause(c *cli.Context) error {
-	err := mack.Tell("iTunes", "pause")
+	_, err := mack.Tell("iTunes", "pause")
 	if err != nil {
 		return fmt.Errorf("cannot pause current music: %s", err)
 	}
@@ -73,7 +75,7 @@ func pause(c *cli.Context) error {
 }
 
 func next(c *cli.Context) error {
-	err := mack.Tell("iTunes", "next track")
+	_, err := mack.Tell("iTunes", "next track")
 	if err != nil {
 		return fmt.Errorf("cannot play next music: %s", err)
 	}
@@ -82,7 +84,7 @@ func next(c *cli.Context) error {
 }
 
 func prev(c *cli.Context) error {
-	err := mack.Tell("iTunes", "previous track")
+	_, err := mack.Tell("iTunes", "previous track")
 	if err != nil {
 		return fmt.Errorf("cannot play previous music: %s", err)
 	}
@@ -91,7 +93,7 @@ func prev(c *cli.Context) error {
 }
 
 func back(c *cli.Context) error {
-	err := mack.Tell("iTunes", "back track")
+	_, err := mack.Tell("iTunes", "back track")
 	if err != nil {
 		return fmt.Errorf("cannot back music: %s", err)
 	}
@@ -114,9 +116,40 @@ func vol(c *cli.Context) error {
 		return fmt.Errorf("invalid range: %d", n)
 	}
 
-	err = mack.Tell("iTunes", fmt.Sprintf("set sound volume to %d", n))
+	_, err = mack.Tell("iTunes", fmt.Sprintf("set sound volume to %d", n))
 	if err != nil {
 		return fmt.Errorf("cannot change volume: %s", err)
+	}
+
+	return nil
+}
+
+func find(c *cli.Context) error {
+	script := `
+	set tx to ""
+	repeat with t in tracks
+		set tx to tx & (name of t) & "\\n"
+	end
+	tx
+	`
+	mackOut, err := mack.Tell("iTunes", script)
+	if err != nil {
+		return err
+	}
+	list := strings.Join(strings.Split(mackOut, "\\n"), "\n")
+
+	out, err := pipeline.Output(
+		[]string{"echo", list},
+		[]string{"fzy"},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = mack.Tell("iTunes", `play track "`+strings.TrimSpace(string(out))+`"`)
+	if err != nil {
+		return fmt.Errorf("cannot play music: %s", err)
 	}
 
 	return nil
