@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
@@ -51,13 +52,24 @@ var commands = []cli.Command{
 	{
 		Name:    "find",
 		Aliases: []string{"v"},
-		Usage:   "Find a music (or playlist, artist, album) by fuzzy search apps",
+		Usage:   "Find a music (or playlist) by fuzzy search apps",
 		Action:  find,
 	},
 }
 
 func play(c *cli.Context) error {
-	_, err := mack.Tell("iTunes", "play")
+	if c.NArg() > 1 {
+		cli.ShowCommandHelp(c, "play")
+		return fmt.Errorf("\ninvalid arguments number")
+	}
+
+	var err error
+	if c.NArg() == 1 {
+		_, err = mack.Tell("iTunes", `play track "`+c.Args()[0]+`"`)
+	} else {
+		_, err = mack.Tell("iTunes", "play")
+	}
+
 	if err != nil {
 		return fmt.Errorf("cannot play music: %s", err)
 	}
@@ -125,9 +137,30 @@ func vol(c *cli.Context) error {
 }
 
 func find(c *cli.Context) error {
+	if c.NArg() > 1 {
+		cli.ShowCommandHelp(c, "find")
+		return fmt.Errorf("\ninvalid arguments number")
+	}
+
+	var selectType string
+	if c.NArg() == 0 {
+		selectType = "tracks"
+	} else {
+		switch c.Args()[0] {
+		case "music", "track":
+			selectType = "tracks"
+		case "plist":
+			selectType = "playlists"
+		case "":
+			selectType = "tracks"
+		default:
+			return fmt.Errorf("invalid argument: %s", c.Args()[0])
+		}
+	}
+
 	script := `
 	set tx to ""
-	repeat with t in tracks
+	repeat with t in ` + selectType + `
 		set tx to tx & (name of t) & "\\n"
 	end
 	tx
@@ -140,14 +173,14 @@ func find(c *cli.Context) error {
 
 	out, err := pipeline.Output(
 		[]string{"echo", list},
-		[]string{"fzy"},
+		[]string{os.Getenv(fuzzy)},
 	)
 
 	if err != nil {
 		return err
 	}
 
-	_, err = mack.Tell("iTunes", `play track "`+strings.TrimSpace(string(out))+`"`)
+	_, err = mack.Tell("iTunes", "play "+selectType+` "`+strings.TrimSpace(string(out))+`"`)
 	if err != nil {
 		return fmt.Errorf("cannot play music: %s", err)
 	}
