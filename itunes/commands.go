@@ -7,7 +7,7 @@ var commands = []cli.Command{
 		Name:    "play",
 		Aliases: []string{"pl", "start"},
 		Usage:   "Play current selected music",
-		Action:  nil,
+		Action:  play,
 	},
 	{
 		Name:    "pause",

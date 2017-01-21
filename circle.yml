@@ -1,4 +1,5 @@
 test:
   override:
+    - go get github.com/everdev/mack
     - go get github.com/urfave/cli
     - go test -v -race ./itunes/...
