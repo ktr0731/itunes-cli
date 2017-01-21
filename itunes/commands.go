@@ -1,6 +1,11 @@
 package main
 
-import "github.com/urfave/cli"
+import (
+	"fmt"
+
+	"github.com/everdev/mack"
+	"github.com/urfave/cli"
+)
 
 var commands = []cli.Command{
 	{
@@ -19,7 +24,7 @@ var commands = []cli.Command{
 		Name:    "next",
 		Aliases: []string{"n", "ne"},
 		Usage:   "Play next music",
-		Action:  nil,
+		Action:  next,
 	},
 	{
 		Name:    "prev",
@@ -31,7 +36,7 @@ var commands = []cli.Command{
 		Name:    "back",
 		Aliases: []string{"b"},
 		Usage:   "Replay current music or play previous music",
-		Action:  nil,
+		Action:  back,
 	},
 	{
 		Name:    "vol",
@@ -45,4 +50,40 @@ var commands = []cli.Command{
 		Usage:   "Find a music (or playlist, artist, album) by fuzzy search apps",
 		Action:  nil,
 	},
+}
+
+func play(c *cli.Context) error {
+	err := mack.Tell("iTunes", "play")
+	if err != nil {
+		return fmt.Errorf("cannot play music: %s", err)
+	}
+
+	return nil
+}
+
+func pause(c *cli.Context) error {
+	err := mack.Tell("iTunes", "pause")
+	if err != nil {
+		return fmt.Errorf("cannot pause current music: %s", err)
+	}
+
+	return nil
+}
+
+func next(c *cli.Context) error {
+	err := mack.Tell("iTunes", "next track")
+	if err != nil {
+		return fmt.Errorf("cannot play next music: %s", err)
+	}
+
+	return nil
+}
+
+func back(c *cli.Context) error {
+	err := mack.Tell("iTunes", "back track")
+	if err != nil {
+		return fmt.Errorf("cannot back music: %s", err)
+	}
+
+	return nil
 }
