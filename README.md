@@ -1,5 +1,4 @@
 # iTunes CLI
-[![CircleCI](https://circleci.com/gh/lycoris0731/itunes-cli.svg?style=svg&circle-token=a7be4ae9b24dc7db2366a3ee4947f95991db4cce)](https://circleci.com/gh/lycoris0731/itunes-cli)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)  
 Command line interface for control iTunes
 
@@ -17,6 +16,11 @@ You can control iTunes operations from command line.
 ## Installation
 ``` sh
 $ go get github.com/lycoris0731/itunes-cli/itunes
+```
+
+And you need to set environment variables for fuzzy-search.  
+``` sh
+$ export ITUNES_CLI_FUZZY_TOOL="fzf"
 ```
 
 ## Usage
@@ -65,12 +69,10 @@ $ itunes vol 20
 ```
 
 ### Find music
-You can find musics by music name (or playlist, artist, album name) by fuzzy-search(fzy, fzf, peco, etc)
+You can find musics by music name (or playlist) by fuzzy-search(fzy, fzf, peco, etc)
 ``` sh
 $ itunes find
 $ itunes find plist
-$ itunes find artist
-$ itunes find album
 ```
 
 ## License
