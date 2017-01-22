@@ -164,7 +164,7 @@ func find(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	list := strings.Join(strings.Split(mackOut, "\\n"), "\n")
+	list := strings.TrimSpace(strings.Join(strings.Split(mackOut, "\\n"), "\n"))
 
 	out, err := pipeline.Output(
 		[]string{"echo", list},
