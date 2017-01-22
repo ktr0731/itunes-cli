@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/everdev/mack"
+	"github.com/lycoris0731/mack"
 	pipeline "github.com/mattn/go-pipeline"
 	"github.com/urfave/cli"
 )
