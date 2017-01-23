@@ -51,7 +51,7 @@ var commands = []cli.Command{
 	},
 	{
 		Name:    "find",
-		Aliases: []string{"v"},
+		Aliases: []string{"f"},
 		Usage:   "Find a music (or playlist) by fuzzy search apps",
 		Action:  find,
 	},
