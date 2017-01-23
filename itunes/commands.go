@@ -172,6 +172,10 @@ func find(c *cli.Context) error {
 	)
 
 	if err != nil {
+		// Ctrl+C
+		if strings.Contains("exit status 130", err.Error()) {
+			return nil
+		}
 		return fmt.Errorf("cannot start fuzzy-search: %s", err)
 	}
 
