@@ -11,6 +11,13 @@ import (
 	"github.com/urfave/cli"
 )
 
+type SelectType string
+
+var (
+	SelectTypeTracks   SelectType = "tracks"
+	SelectTypePlayList SelectType = "playlists"
+)
+
 var commands = []cli.Command{
 	{
 		Name:    "play",
@@ -54,6 +61,12 @@ var commands = []cli.Command{
 		Aliases: []string{"f"},
 		Usage:   "Find a music (or playlist) by fuzzy search apps",
 		Action:  find,
+	},
+	{
+		Name:    "list",
+		Aliases: []string{"l", "list", "ls"},
+		Usage:   "List all music names of iTunes",
+		Action:  list,
 	},
 }
 
@@ -137,34 +150,15 @@ func find(c *cli.Context) error {
 		return fmt.Errorf("\ninvalid arguments number")
 	}
 
-	var selectType string
-	if c.NArg() == 0 {
-		selectType = "tracks"
-	} else {
-		switch c.Args()[0] {
-		case "music", "track":
-			selectType = "tracks"
-		case "plist":
-			selectType = "playlists"
-		case "":
-			selectType = "tracks"
-		default:
-			return fmt.Errorf("invalid argument: %s", c.Args()[0])
-		}
+	selectType := SelectTypeTracks
+	if c.NArg() != 0 {
+		selectType = getSelectType(c.Args()[0])
 	}
 
-	script := `
-	set tx to ""
-	repeat with t in ` + selectType + `
-		set tx to tx & (name of t) & "\\n"
-	end
-	tx
-	`
-	mackOut, err := mack.Tell("iTunes", script)
+	list, err := listMusics(selectType)
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot get music list: %s", err)
 	}
-	list := strings.TrimSpace(strings.Join(strings.Split(mackOut, "\\n"), "\n"))
 
 	out, err := pipeline.Output(
 		[]string{"echo", list},
@@ -183,9 +177,45 @@ func find(c *cli.Context) error {
 		return fmt.Errorf("cannot select empty string")
 	}
 
-	if _, err = mack.Tell("iTunes", "play "+selectType+` "`+strings.TrimSpace(string(out))+`"`); err != nil {
+	if _, err = mack.Tell("iTunes", "play "+string(selectType)+` "`+strings.TrimSpace(string(out))+`"`); err != nil {
 		return fmt.Errorf("cannot play music: %s", err)
 	}
 
 	return nil
+}
+
+func list(c *cli.Context) error {
+	selectType := SelectTypeTracks
+	if c.NArg() != 0 {
+		selectType = getSelectType(c.Args()[0])
+	}
+	fmt.Println(listMusics(selectType))
+	return nil
+}
+
+func listMusics(selectType SelectType) (string, error) {
+	script := `
+	set tx to ""
+	repeat with t in ` + string(selectType) + `
+		set tx to tx & (name of t) & "\\n"
+	end
+	tx
+	`
+	mackOut, err := mack.Tell("iTunes", script)
+	if err != nil {
+		return "", err
+	}
+	list := strings.TrimSpace(strings.Join(strings.Split(mackOut, "\\n"), "\n"))
+	return list, nil
+}
+
+func getSelectType(t string) SelectType {
+	switch t {
+	case "music", "track":
+		return SelectTypeTracks
+	case "plist":
+		return SelectTypePlayList
+	default:
+		return SelectTypeTracks
+	}
 }
