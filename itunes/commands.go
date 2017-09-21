@@ -177,7 +177,7 @@ func find(c *cli.Context) error {
 		return fmt.Errorf("cannot select empty string")
 	}
 
-	if _, err = mack.Tell("iTunes", "play "+string(selectType)+` "`+strings.TrimSpace(string(out))+`"`); err != nil {
+	if _, err = mack.Tell("iTunes", fmt.Sprintf(`play %s "%s"`, string(selectType), strings.Replace(strings.TrimSpace(string(out)), `"`, `\"`, -1))); err != nil {
 		return fmt.Errorf("cannot play music: %s", err)
 	}
 
