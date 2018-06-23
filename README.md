@@ -3,7 +3,7 @@ Command line interface for control iTunes
 
 ![demo](./demo.gif)  
 
-===
+---  
 
 ## Description  
 You can control iTunes operations from command line.  
