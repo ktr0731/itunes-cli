@@ -1,0 +1,6 @@
+github.com/everdev/mack v0.0.0-20180604194106-83ad607f6010 h1:YCE+Yya5u0KNa1ML5qCfRzoFLwDovb2D+0TPS9F0n+I=
+github.com/everdev/mack v0.0.0-20180604194106-83ad607f6010/go.mod h1:9b3JPh49iYN2BWgsGwc77VTYIni+FpwOH8f7oanwA6M=
+github.com/mattn/go-pipeline v0.0.0-20170920030317-cfb87a531e2b h1:tllLy4xWlUKqXcHijy3zere2s/7y0EJXjbyGeNYrpe8=
+github.com/mattn/go-pipeline v0.0.0-20170920030317-cfb87a531e2b/go.mod h1:THCMZVX5asLpinN+6hFlR1xKFcFsaDpAtUltGqZauBM=
+github.com/urfave/cli v1.20.0 h1:fDqGv3UG/4jbVl/QkFwEdddtEDjh/5Ov6X+0B/3bPaw=
+github.com/urfave/cli v1.20.0/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijbERA=
