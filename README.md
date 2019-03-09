@@ -12,16 +12,10 @@ You can control iTunes operations from command line.
 - macOS Sierra or later
 - iTunes 12.5.4 or later
 - Go
-- One of fuzzy finders
 
 ## Installation
 ``` sh
 $ go get github.com/lycoris0731/itunes-cli/itunes
-```
-
-And you need to set environment variables for fuzzy-search.  
-``` sh
-$ export ITUNES_CLI_FUZZY_TOOL="fzf"
 ```
 
 ## Usage
@@ -70,7 +64,7 @@ $ itunes vol 20
 ```
 
 ### Find music
-You can find musics by music name (or playlist) by fuzzy-search(fzy, fzf, peco, etc)
+You can find musics by a fuzzy-finder.
 ``` sh
 $ itunes find
 $ itunes find plist

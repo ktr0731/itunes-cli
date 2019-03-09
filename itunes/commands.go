@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 
 	"github.com/everdev/mack"
-	pipeline "github.com/mattn/go-pipeline"
+	"github.com/ktr0731/go-fuzzyfinder"
+	"github.com/pkg/errors"
 	"github.com/urfave/cli"
 )
 
@@ -155,29 +155,21 @@ func find(c *cli.Context) error {
 		selectType = getSelectType(c.Args()[0])
 	}
 
-	list, err := listMusics(selectType)
+	listStr, err := listMusics(selectType)
 	if err != nil {
 		return fmt.Errorf("cannot get music list: %s", err)
 	}
 
-	out, err := pipeline.Output(
-		[]string{"echo", list},
-		[]string{os.Getenv(fuzzy)},
-	)
+	list := strings.Split(listStr, "\n")
 
-	if err != nil {
-		// Ctrl+C
-		if strings.Contains("exit status 130", err.Error()) {
-			return nil
-		}
-		return fmt.Errorf("cannot start fuzzy-search: %s", err)
+	idx, err := fuzzyfinder.Find(list, func(i int) string {
+		return list[i]
+	})
+	if err != nil && err != fuzzyfinder.ErrAbort {
+		return errors.Wrap(err, "failed to select a track")
 	}
 
-	if strings.TrimSpace(string(out)) == "" {
-		return fmt.Errorf("cannot select empty string")
-	}
-
-	if _, err = mack.Tell("iTunes", fmt.Sprintf(`play %s "%s"`, string(selectType), strings.Replace(strings.TrimSpace(string(out)), `"`, `\"`, -1))); err != nil {
+	if _, err = mack.Tell("iTunes", fmt.Sprintf(`play %s "%s"`, string(selectType), strings.Replace(list[idx], `"`, `\"`, -1))); err != nil {
 		return fmt.Errorf("cannot play music: %s", err)
 	}
 
