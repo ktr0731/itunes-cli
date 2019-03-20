@@ -20,6 +20,12 @@ var (
 
 var commands = []cli.Command{
 	{
+		Name:    "status",
+		Aliases: []string{"s", "stat"},
+		Usage:   "Shows iTunes' status, current artist and track.",
+		Action:  status,
+	},
+	{
 		Name:    "play",
 		Aliases: []string{"pl", "start"},
 		Usage:   "Play current selected music",
@@ -67,6 +73,12 @@ var commands = []cli.Command{
 		Aliases: []string{"l", "list", "ls"},
 		Usage:   "List all music names of iTunes",
 		Action:  list,
+	},
+	{
+		Name:    "shuffle",
+		Aliases: []string{"shuf", "sh"},
+		Usage:   "Enables snuffling of the current playlist",
+		Action:  shuffle,
 	},
 }
 
@@ -201,13 +213,64 @@ func listMusics(selectType SelectType) (string, error) {
 	return list, nil
 }
 
+func status(c *cli.Context) error {
+	state, err := mack.Tell("iTunes", "get player state as string")
+
+	if err != nil {
+		return fmt.Errorf("cannot get iTunes status: %s", err)
+	}
+	fmt.Println("iTunes is currently", state)
+
+	if state == "playing" {
+		artist, _ := mack.Tell("iTunes", "get artist of current track as string")
+		track, _ := mack.Tell("iTunes", "get name of current track as string")
+
+		fmt.Println("Current Track ", artist, ": ", track)
+	}
+
+	return nil
+}
+
+func shuffle(c *cli.Context) error {
+	if c.NArg() > 1 {
+		cli.ShowCommandHelp(c, "shuffle")
+		return fmt.Errorf("\ninvalid arguments number")
+	}
+
+	var err error
+	if c.NArg() == 1 {
+		desiredState := getShuffleStateBool(c.Args()[0])
+		_, err = mack.Tell("iTunes", `set shuffle enabled to "`+desiredState+`"`)
+	} else {
+		_, err = mack.Tell("iTunes", "set shuffle enabled to true")
+	}
+
+	if err != nil {
+		return fmt.Errorf("cannot set the desired shuffle state: %s", err)
+	}
+
+	fmt.Println("Shuffle is now", c.Args()[0])
+	return nil
+}
+
 func getSelectType(t string) SelectType {
 	switch t {
 	case "music", "track":
 		return SelectTypeTracks
-	case "plist":
+	case "plist", "playlists":
 		return SelectTypePlayList
 	default:
 		return SelectTypeTracks
+	}
+}
+
+func getShuffleStateBool(t string) string {
+	switch t {
+	case "ON", "on":
+		return "true"
+	case "OFF", "off":
+		return "false"
+	default:
+		return "true"
 	}
 }
