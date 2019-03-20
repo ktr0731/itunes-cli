@@ -77,7 +77,7 @@ var commands = []cli.Command{
 	{
 		Name:    "shuffle",
 		Aliases: []string{"shuf", "sh"},
-		Usage:   "Enables snuffling of the current playlist",
+		Usage:   "Enables or disables shuffling. Set with ON or OFF.",
 		Action:  shuffle,
 	},
 }
