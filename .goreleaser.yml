@@ -1,6 +1,7 @@
 builds:
 -
   main: ./itunes/main.go
+  binary: itunes
   env:
     - CGO_ENABLED=0
   goos:
@@ -10,7 +11,6 @@ builds:
   goarch:
     - amd64
     - arm
-    - '386'
 archives:
 -
   name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
