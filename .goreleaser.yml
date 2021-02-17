@@ -1,6 +1,7 @@
 builds:
 -
   main: ./itunes/main.go
+  binary: itunes
   env:
     - CGO_ENABLED=0
   goos:
