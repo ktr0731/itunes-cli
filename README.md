@@ -15,8 +15,10 @@ You can control iTunes operations from command line.
 
 ## Installation
 ``` sh
-$ go get github.com/lycoris0731/itunes-cli/itunes
+$ go get github.com/ktr0731/itunes-cli/itunes
 ```
+
+Or GitHub Releases are also available.
 
 ## Usage
 Each sub-commands can use shorter name.  
