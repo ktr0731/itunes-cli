@@ -1,0 +1,22 @@
+version: 2
+updates:
+- package-ecosystem: gomod
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "20:00"
+  open-pull-requests-limit: 10
+  reviewers:
+  - ktr0731
+  labels:
+  - update
+  ignore:
+  - dependency-name: github.com/pkg/errors
+    versions:
+    - 0.9.1
+  - dependency-name: github.com/urfave/cli
+    versions:
+    - 1.22.5
+  - dependency-name: github.com/ktr0731/go-fuzzyfinder
+    versions:
+    - 0.3.2
